@@ -1,0 +1,25 @@
+services:
+  hsqldb:
+    image: blacklabelops/hsqldb
+    ports:
+      - "9002:9001"
+    environment:
+      HSQLDB_DATABASE: "mydb"
+      HSQLDB_USERNAME: "sa"
+      HSQLDB_PASSWORD: ""
+    volumes:
+      - hsqldb-data:/opt/hsqldb
+
+  tomcat-10-0-11-jdk21:
+    image: tomcat:jdk21-openjdk
+    ports:
+      - "4000:8080"
+      - "5005:5005"
+    command: "catalina.sh run"
+    volumes:
+      - "./target:/usr/local/tomcat/webapps"
+    environment:
+      JAVA_OPTS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+volumes:
+  hsqldb-data:

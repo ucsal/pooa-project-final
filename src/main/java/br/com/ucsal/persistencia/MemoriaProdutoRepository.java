@@ -7,10 +7,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import br.com.ucsal.model.Produto;
-import br.com.ucsal.util.ioc.Injectable;
 
 
-@Injectable
+
 public class MemoriaProdutoRepository implements ProdutoRepository<Produto, Integer>{
 
     private Map<Integer, Produto> produtos = new HashMap<>();
@@ -18,7 +17,7 @@ public class MemoriaProdutoRepository implements ProdutoRepository<Produto, Inte
 
     private static MemoriaProdutoRepository instancia;
     
-    private MemoriaProdutoRepository() {
+    public MemoriaProdutoRepository() {
     }
     
     

@@ -6,10 +6,12 @@ import br.com.ucsal.model.Produto;
 import br.com.ucsal.persistencia.HSQLProdutoRepository;
 import br.com.ucsal.service.ProdutoService;
 import br.com.ucsal.util.command.Rota;
+import br.com.ucsal.util.ioc.Injectable;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+@Injectable
 @Rota("/editarProduto")
 public class ProdutoEditarServlet implements Command {
     private static final long serialVersionUID = 1L;

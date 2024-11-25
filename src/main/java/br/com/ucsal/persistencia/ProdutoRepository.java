@@ -4,6 +4,8 @@ import java.util.List;
 
 import br.com.ucsal.model.Produto;
 
+
+
 public interface ProdutoRepository<T,I> {
 	
     void adicionar(T entidade);
