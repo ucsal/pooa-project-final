@@ -7,18 +7,26 @@ import br.com.ucsal.model.Produto;
 import br.com.ucsal.persistencia.HSQLProdutoRepository;
 import br.com.ucsal.service.ProdutoService;
 import br.com.ucsal.util.command.Rota;
+import br.com.ucsal.util.ioc.Inject;
+import br.com.ucsal.util.ioc.Injectable;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+
+
+
 @Rota("/listarProdutos")
+@Injectable
 public class ProdutoListarServlet implements Command {
     private static final long serialVersionUID = 1L;
-	private ProdutoService produtoService;
 
-	public ProdutoListarServlet() {
-        produtoService = new ProdutoService(new HSQLProdutoRepository());
+	private final ProdutoService produtoService;
+
+    @Inject
+	public ProdutoListarServlet(ProdutoService produtoService) {
+       this.produtoService = produtoService;
 	}
 	
 

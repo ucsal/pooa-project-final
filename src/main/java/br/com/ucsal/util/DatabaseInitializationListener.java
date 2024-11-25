@@ -6,11 +6,8 @@ import jakarta.servlet.annotation.WebListener;
 
 @WebListener
 public class DatabaseInitializationListener implements ServletContextListener {
-
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("Iniciando o banco de dados HSQLDB...");
-        DatabaseUtil.iniciarBanco();
     }
 
     @Override

@@ -14,12 +14,14 @@ import java.io.IOException;
 @WebServlet("/view/*") // Mapeia todas as requisições com "/view/*"
 public class ProdutoController extends HttpServlet {
 
-
     private final CommandBus commandBus = CommandBus.getInstance();
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
+
+        System.out.println("Path: " + path);
+
         this.commandBus.run(path, request, response);
     }
 }

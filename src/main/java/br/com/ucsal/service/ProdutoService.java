@@ -4,10 +4,14 @@ import java.util.List;
 
 import br.com.ucsal.model.Produto;
 import br.com.ucsal.persistencia.ProdutoRepository;
+import br.com.ucsal.util.ioc.Inject;
+import br.com.ucsal.util.ioc.Injectable;
 
+@Injectable
 public class ProdutoService {
- private ProdutoRepository<Produto, Integer> produtoRepository;
+ private  ProdutoRepository<Produto, Integer>  produtoRepository;
 
+ @Inject
  public ProdutoService(ProdutoRepository<Produto, Integer> produtoRepository) {
      this.produtoRepository = produtoRepository;
  }

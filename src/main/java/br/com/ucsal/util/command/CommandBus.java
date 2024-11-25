@@ -1,6 +1,7 @@
 package br.com.ucsal.util.command;
 
 import br.com.ucsal.controller.Command;
+import br.com.ucsal.util.ioc.DependencyInjector;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,40 +15,53 @@ import java.util.Set;
 public class CommandBus {
     private static CommandBus instance;
     private final Map<String, Command> commands;
+    private final DependencyInjector dependencyInjector;
 
-    public  static CommandBus getInstance() {
-        if(instance == null) {
+    public static CommandBus getInstance() {
+        if (instance == null) {
             instance = new CommandBus();
         }
 
         return instance;
     }
 
-    public  CommandBus() {
+    public CommandBus() {
         this.commands = new HashMap<>();
+        this.dependencyInjector = DependencyInjector.getInstance();
     }
 
-    public void scanCommandHandlers()  throws ServletException {
+    public void scanCommandHandlers() throws ServletException {
         try {
             Set<Class<?>> classes = new Reflections("br.com.ucsal.controller").getTypesAnnotatedWith(Rota.class);
             for (Class<?> clazz : classes) {
                 if (Command.class.isAssignableFrom(clazz)) {
                     Rota rota = clazz.getAnnotation(Rota.class);
-                    Command commandInstance = (Command) clazz.getDeclaredConstructor().newInstance();
+                    Command commandInstance = createCommandInstance(clazz);  // Usa o DependencyInjector para criar a instância
                     commands.put(rota.value(), commandInstance);
                     System.out.println("Rota registrada: " + rota.value() + " -> " + clazz.getSimpleName());
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServletException("Erro ao carregar rotas dinamicamente", e);
         }
     }
 
-    public void run(String path, HttpServletRequest request, HttpServletResponse response ) throws IOException, ServletException {
+    private Command createCommandInstance(Class<?> clazz) throws Exception {
+        Command commandInstance = (Command) dependencyInjector.getClassInContainer(clazz.getName());
+
+        if (commandInstance == null) {
+            throw new IllegalStateException("Não foi possível criar a instância do comando: " + clazz.getSimpleName());
+        }
+        return commandInstance;
+    }
+
+
+    public void run(String path, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Command command = commands.get(path);
         if (command != null) {
             command.execute(request, response);
-        }else {
+        } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Página não encontrada");
         }
     }
