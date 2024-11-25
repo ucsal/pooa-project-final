@@ -9,7 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * Algumas coisas acontecem aqui, mas o principal é que o DependencyInjector é um singleton que
+ * Que faz a varredura de classes anotadas com @Injectable e mapeia as classes concretas e interfaces
+ * que são anotadas com @Injectable.
+ * 1 Mapeia todas as classes
+ * 2 Resolve as dependências
+ * 3 Trata o mapeamento de interfaces (mapeia a interface para a implementação)
+ * OBS: Tem tratamento especial pra interfaces de comando que são mapeadas para a implementação
+ */
 
 public class DependencyInjector {
     private Map<String, Object> singletonInstances = new HashMap<>();
