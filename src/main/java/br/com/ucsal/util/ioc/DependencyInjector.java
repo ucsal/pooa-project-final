@@ -1,41 +1,41 @@
 package br.com.ucsal.util.ioc;
+import br.com.ucsal.persistencia.PersistenceType;
+import br.com.ucsal.persistencia.RegisterPersistence;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-/**
- * Algumas coisas acontecem aqui, mas o principal é que o DependencyInjector é um singleton que
- * Que faz a varredura de classes anotadas com @Injectable e mapeia as classes concretas e interfaces
- * que são anotadas com @Injectable.
- * 1 Mapeia todas as classes
- * 2 Resolve as dependências
- * 3 Trata o mapeamento de interfaces (mapeia a interface para a implementação)
- * OBS: Tem tratamento especial pra interfaces de comando que são mapeadas para a implementação
- */
+import java.util.*;
 
 public class DependencyInjector {
-    private Map<String, Object> singletonInstances = new HashMap<>();
-    private Map<String, Class<?>> registeredClasses = new HashMap<>();
+    private final Map<String, Object> singletonInstances = new HashMap<>();
+    private final Map<String, Class<?>> registeredClasses = new HashMap<>();
+    private final String persistencePackage = "br.com.ucsal.persistencia";
+
+    private PersistenceType persistenceType;
 
     public void scanAndRegister(String ...packageName) throws Exception {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackages(packageName)
-                .addScanners(new SubTypesScanner(), new TypeAnnotationsScanner()));
+                .addScanners(Scanners.SubTypes, Scanners.TypesAnnotated));
 
-        Set<Class<?>> injectableClasses = reflections.getTypesAnnotatedWith(Injectable.class);
+        Set<Class<?>> classesWithValidAnnotates= new HashSet<>();
 
-        for (Class<?> clazz : injectableClasses) {
-            System.out.println("Classes anotadas encontras: " + clazz.getName());
-        }
+        classesWithValidAnnotates.addAll(reflections.getTypesAnnotatedWith(Injectable.class));
+        classesWithValidAnnotates.addAll(reflections.getTypesAnnotatedWith(RegisterPersistence.class));
 
-        for (Class<?> clazz : injectableClasses) {
-            mapClass(clazz);
+
+        for (Class<?> clazz : classesWithValidAnnotates) {
+              if(clazz.isAnnotationPresent(Injectable.class)){
+                System.out.println("Classe com anotação de injeção de dependência: " + clazz.getName());
+              }
+
+           if(clazz.isAnnotationPresent(RegisterPersistence.class)){
+               System.out.println("Classe com anotação de persistência config: " + clazz.getName());
+               persistenceType = clazz.getAnnotation(RegisterPersistence.class).value();
+           }
+
+            registerClass(clazz);
         }
 
         for (String className : registeredClasses.keySet()) {
@@ -43,47 +43,36 @@ public class DependencyInjector {
         }
     }
 
-    private void mapClass(Class<?> clazz) {
+    private void registerClass(Class<?> clazz) {
         if (clazz.isInterface()) {
             throw new IllegalArgumentException("Não é possível anotar interfaces diretamente com @Injectable: " + clazz.getName());
         }
-
         String className = clazz.getName();
         Class<?>[] interfaces = clazz.getInterfaces();
 
-        boolean isCommandInterface = Arrays.stream(interfaces).anyMatch(i -> i.getName().equals("br.com.ucsal.controller.Command"));
-
-        System.out.println("Mapeando classe: " + className);
-        System.out.println("Interfaces: " + Arrays.toString(interfaces));
-        System.out.println("É interface de comando? " + isCommandInterface);
-
-        System.out.println("Precisa resolve a interface " + (interfaces.length > 0 && !isCommandInterface));
-
-        if (interfaces.length > 0 && !isCommandInterface) {
-            for (Class<?> iface : interfaces) {
-                registeredClasses.put(iface.getName(), clazz); // Mapeia interface -> implementação
-            }
-        } else {
-
-            registeredClasses.put(className, clazz); // Mapeia classe concreta
-        }
-
+        registeredClasses.put(className, clazz);
     }
 
     public Object resolveDependencies(String className) throws Exception {
         if (singletonInstances.containsKey(className)) {
-            return singletonInstances.get(className); // Retorna a instância existente
+            return singletonInstances.get(className);
         }
 
         Class<?> implementation = registeredClasses.get(className);
+
         if (implementation == null) {
             throw new IllegalStateException("Nenhuma implementação registrada para " + className);
         }
 
         Constructor<?> injectConstructor = getInjectableConstructor(implementation);
+
         Object instance = createInstance(injectConstructor);
 
-        singletonInstances.put(className, instance);
+        if(implementation.isAnnotationPresent(Singleton.class)) {
+            System.out.println("Detectado anotação @Singleton Registrando instância singleton de " + className);
+            singletonInstances.put(className, instance);
+        }
+
         return instance;
     }
 
@@ -101,28 +90,29 @@ public class DependencyInjector {
         Object[] parameters = new Object[parameterTypes.length];
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            String dependencyName = parameterTypes[i].getName(); // Nome da dependência
-            parameters[i] = resolveDependencies(dependencyName); // Resolve dependência pelo nome
+            boolean isPersistenceType = parameterTypes[i].getName().equals("br.com.ucsal.persistencia.ProdutoRepository");
+
+
+            if(isPersistenceType){
+                System.out.println("Resolvendo dependência de persistência: " + persistenceType.getClassName());
+                parameters[i] = resolveDependencies(persistencePackage + "." + persistenceType.getClassName());
+                continue;
+            }
+            String dependencyName = parameterTypes[i].getName();
+            parameters[i] = resolveDependencies(dependencyName);
         }
 
         return constructor.newInstance(parameters);
     }
 
-    public Object getClassInContainer(String className) {
-
-        for (String classname : registeredClasses.keySet()) {
-            System.out.println("Classe registrada: " + classname);
-        }
-
+    public Object getClassInContainer(String className) throws Exception {
         System.out.println("Retornando instância de " + className);
-        return singletonInstances.get(className);
+        return singletonInstances.get(className) != null ? singletonInstances.get(className) :resolveDependencies(className);
     }
 
     private static DependencyInjector dependencyInjector;
 
     public static DependencyInjector getInstance() {
-
-
         if (dependencyInjector == null) {
             dependencyInjector = new DependencyInjector();
         }

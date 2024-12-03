@@ -7,6 +7,7 @@ import java.io.IOException;
 import br.com.ucsal.persistencia.HSQLProdutoRepository;
 import br.com.ucsal.service.ProdutoService;
 import br.com.ucsal.util.command.Rota;
+import br.com.ucsal.util.ioc.Inject;
 import br.com.ucsal.util.ioc.Injectable;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -22,9 +23,9 @@ public class ProdutoAdicionarServlet implements Command {
 
  private ProdutoService produtoService;
 
- public ProdutoAdicionarServlet() {
-     // Inicializa o serviço com o repositório
-     this.produtoService = new ProdutoService(new HSQLProdutoRepository());
+ @Inject
+ public ProdutoAdicionarServlet(ProdutoService produtoService) {
+    this.produtoService = produtoService;
  }
 
  @Override

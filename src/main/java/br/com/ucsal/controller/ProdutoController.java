@@ -1,5 +1,7 @@
 package br.com.ucsal.controller;
 
+import br.com.ucsal.persistencia.PersistenceType;
+import br.com.ucsal.persistencia.RegisterPersistence;
 import br.com.ucsal.util.command.CommandBus;
 
 import jakarta.servlet.ServletException;
@@ -11,6 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+
+@RegisterPersistence(PersistenceType.HSQL)
 @WebServlet("/view/*") // Mapeia todas as requisições com "/view/*"
 public class ProdutoController extends HttpServlet {
 

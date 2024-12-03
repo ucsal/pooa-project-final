@@ -5,6 +5,7 @@ import java.io.IOException;
 import br.com.ucsal.persistencia.HSQLProdutoRepository;
 import br.com.ucsal.service.ProdutoService;
 import br.com.ucsal.util.command.Rota;
+import br.com.ucsal.util.ioc.Inject;
 import br.com.ucsal.util.ioc.Injectable;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,10 +15,13 @@ import jakarta.servlet.http.HttpServletResponse;
 @Rota("/excluirProduto")
 public class ProdutoExcluirServlet implements Command {
 	private static final long serialVersionUID = 1L;
-	private ProdutoService produtoService;
 
-	public ProdutoExcluirServlet() {
-		produtoService = new ProdutoService(new HSQLProdutoRepository());
+	private final ProdutoService produtoService;
+
+
+	@Inject
+	public ProdutoExcluirServlet(ProdutoService produtoService) {
+		this.produtoService = produtoService;
 	}
 
 	@Override
