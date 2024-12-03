@@ -9,7 +9,7 @@ import br.com.ucsal.util.ioc.Injectable;
 
 @Injectable
 public class ProdutoService {
- private  ProdutoRepository<Produto, Integer>  produtoRepository;
+ private  final ProdutoRepository<Produto, Integer>  produtoRepository;
 
  @Inject
  public ProdutoService(ProdutoRepository<Produto, Integer> produtoRepository) {

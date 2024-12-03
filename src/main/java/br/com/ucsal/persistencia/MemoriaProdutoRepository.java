@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import br.com.ucsal.model.Produto;
+import br.com.ucsal.util.ioc.Injectable;
+import br.com.ucsal.util.ioc.Singleton;
 
 
-
+@Injectable
+@Singleton
 public class MemoriaProdutoRepository implements ProdutoRepository<Produto, Integer>{
 
     private Map<Integer, Produto> produtos = new HashMap<>();
@@ -18,6 +21,7 @@ public class MemoriaProdutoRepository implements ProdutoRepository<Produto, Inte
     private static MemoriaProdutoRepository instancia;
     
     public MemoriaProdutoRepository() {
+        System.out.println("MemoriaProdutoRepository instanciado");
     }
     
     
@@ -49,6 +53,8 @@ public class MemoriaProdutoRepository implements ProdutoRepository<Produto, Inte
 
     @Override
     public List<Produto> listar() {
+        System.out.println("Listando produtos " + produtos.size());
+
         return new ArrayList<>(produtos.values());
     }
 
