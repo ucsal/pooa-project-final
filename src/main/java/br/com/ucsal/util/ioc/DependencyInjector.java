@@ -14,6 +14,8 @@ public class DependencyInjector {
 
     private PersistenceType persistenceType;
 
+
+    // Inicia a varredura de pacotes e registra as classes anotadas
     public void scanAndRegister(String ...packageName) throws Exception {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackages(packageName)
@@ -43,16 +45,17 @@ public class DependencyInjector {
         }
     }
 
+    // Registra a classe no container IOC
     private void registerClass(Class<?> clazz) {
         if (clazz.isInterface()) {
             throw new IllegalArgumentException("Não é possível anotar interfaces diretamente com @Injectable: " + clazz.getName());
         }
         String className = clazz.getName();
-        Class<?>[] interfaces = clazz.getInterfaces();
-
         registeredClasses.put(className, clazz);
     }
 
+
+    // Resolve as dependências da classe
     public Object resolveDependencies(String className) throws Exception {
         if (singletonInstances.containsKey(className)) {
             return singletonInstances.get(className);
@@ -76,6 +79,8 @@ public class DependencyInjector {
         return instance;
     }
 
+
+    // Obtém o construtor anotado com @Inject
     private Constructor<?> getInjectableConstructor(Class<?> clazz) throws Exception {
         for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
             if (constructor.isAnnotationPresent(Inject.class)) {
@@ -85,6 +90,8 @@ public class DependencyInjector {
         return clazz.getDeclaredConstructor(); // Retorna o construtor padrão
     }
 
+
+    // Cria a instância da classe como suas respectivas dependências
     private Object createInstance(Constructor<?> constructor) throws Exception {
         Class<?>[] parameterTypes = constructor.getParameterTypes();
         Object[] parameters = new Object[parameterTypes.length];
@@ -105,6 +112,7 @@ public class DependencyInjector {
         return constructor.newInstance(parameters);
     }
 
+    // Retorna a instância da classe salva no container IOC
     public Object getClassInContainer(String className) throws Exception {
         System.out.println("Retornando instância de " + className);
         return singletonInstances.get(className) != null ? singletonInstances.get(className) :resolveDependencies(className);
