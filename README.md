@@ -2,7 +2,7 @@
 
 ---
 
-## **Integrantes*
+## **Integrantes**
 - Alisson de Oliveira - R.A **200029600**
 - Davi Ribeiro - R.A **200016718**
 - Denilson Melo - R.A **200028969**
