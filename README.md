@@ -2,20 +2,21 @@
 
 ---
 
-
-## **Integrantes**
-
+## **Integrantes*
 - Alisson de Oliveira - R.A **200029600**
 - Davi Ribeiro - R.A **200016718**
 - Denilson Melo - R.A **200028969**
 - Maria Clara Mendes - R.A **200028802**
 - Maria Fernanda Barçante - R.A **200028863**
 - Vinicius Lago - R.A **200028769**
+- Adnan Fatal Anunciação Nascimento - R.A **200028791**
+- Larissa da Silva Santana - R.A **200029897**
+- Luan Gabriel Ornelas Sacramento Oliveira - R.A  **20027297**
 
 ## **Descrição Geral**
-
 Este projeto é um **sistema de injeção de dependências** que utiliza reflexão para gerenciar a criação de instâncias de forma automática, suportando anotações personalizadas e organização de dependências. Além disso, implementa um **sistema de gerenciamento de rotas** baseado no padrão **Command**, permitindo que rotas sejam registradas e executadas dinamicamente.
 
+ - Projeto está dentro da porta [http://localhost:4000/prova2/view/](http://localhost:4000/prova2/view/)
 ---
 
 ## **Explicação das Anotações Criadas**

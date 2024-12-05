@@ -23,8 +23,7 @@ public class MemoriaProdutoRepository implements ProdutoRepository<Produto, Inte
     public MemoriaProdutoRepository() {
         System.out.println("MemoriaProdutoRepository instanciado");
     }
-    
-    
+
     public static synchronized MemoriaProdutoRepository getInstancia() {
     	if(instancia == null) {
     		instancia = new MemoriaProdutoRepository();
