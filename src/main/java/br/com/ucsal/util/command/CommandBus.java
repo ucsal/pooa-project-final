@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+
 public class CommandBus {
     private static CommandBus instance;
     private final Map<String, Command> commands;
@@ -30,9 +31,10 @@ public class CommandBus {
         this.dependencyInjector = DependencyInjector.getInstance();
     }
 
-    public void scanCommandHandlers() throws ServletException {
+    // Escaneia todos os comandos anotados com @Rota
+    public void scanCommandHandlers(String commandsDirector) throws ServletException {
         try {
-            Set<Class<?>> classes = new Reflections("br.com.ucsal.controller").getTypesAnnotatedWith(Rota.class);
+            Set<Class<?>> classes = new Reflections(commandsDirector).getTypesAnnotatedWith(Rota.class);
             for (Class<?> clazz : classes) {
                 if (Command.class.isAssignableFrom(clazz)) {
                     Rota rota = clazz.getAnnotation(Rota.class);
@@ -47,6 +49,7 @@ public class CommandBus {
         }
     }
 
+    // Cria a instância do comando utilizando o DependencyInjector (IOC)
     private Command createCommandInstance(Class<?> clazz) throws Exception {
         Command commandInstance = (Command) dependencyInjector.getClassInContainer(clazz.getName());
 

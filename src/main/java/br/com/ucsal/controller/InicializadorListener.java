@@ -16,13 +16,9 @@ public class InicializadorListener implements ServletContextListener {
             System.out.println("Inicializando recursos na inicialização da aplicação");
             CommandBus commandBus = CommandBus.getInstance();
             DependencyInjector dependencyInjector = DependencyInjector.getInstance();
-            dependencyInjector.scanAndRegister(
-                    "br.com.ucsal",
-                    "br.com.ucsal.controller",
-                    "br.com.ucsal.service",
-                    "br.com.ucsal.persistencia"
-            );
-            commandBus.scanCommandHandlers();
+
+            dependencyInjector.scanAndRegister("br.com.ucsal");
+            commandBus.scanCommandHandlers("br.com.ucsal");
 
             System.out.println("Iniciando o banco de dados HSQLDB...");
             DatabaseUtil.iniciarBanco();
